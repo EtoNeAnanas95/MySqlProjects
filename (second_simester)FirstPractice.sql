@@ -414,41 +414,42 @@ WHERE ID_fine = 6;
 
 --ДА ОНИ МАКСИМАЛЬНО ПРОСТЫЕ, НО Я МЕГА НЕУСПЕВАЮ ЭТО ДОДЕЛАТЬ(((
 --ИЗВИНИТЕ ПОЖАЛУЙСТА)
-CREATE TRIGGER ShowLog1
-ON fine
-AFTER UPDATE
-AS
-    BEGIN
-       PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В FINE'
-    END;
-GO
 
-CREATE TRIGGER ShowLog2
-ON bonus
-AFTER UPDATE
-AS
-    BEGIN
-       PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В BONUS'
-    END;
-GO
+-- CREATE TRIGGER ShowLog1
+-- ON fine
+-- AFTER UPDATE
+-- AS
+--     BEGIN
+--        PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В FINE'
+--     END;
+-- GO
 
-CREATE TRIGGER ShowLog3
-ON wages
-AFTER UPDATE
-AS
-    BEGIN
-       PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В WAGES'
-    END;
-GO
+-- CREATE TRIGGER ShowLog2
+-- ON bonus
+-- AFTER UPDATE
+-- AS
+--     BEGIN
+--        PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В BONUS'
+--     END;
+-- GO
+--
+-- CREATE TRIGGER ShowLog3
+-- ON wages
+-- AFTER UPDATE
+-- AS
+--     BEGIN
+--        PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В WAGES'
+--     END;
+-- GO
 ------------------------------------------------------------------------------------
 
 ------------------------------СОЗДАНИЕ ПОЛЬЗОВАТЕЛЕЙ--------------------------------
-CREATE LOGIN FirstUser WITH PASSWORD = '123';
-CREATE LOGIN SecondUser WITH PASSWORD = '123';
+CREATE LOGIN FirstUserLogin WITH PASSWORD = '123';
+CREATE LOGIN SecondUserLogin WITH PASSWORD = '123';
 GO
 
-CREATE USER FirstUser FOR LOGIN FirstUser;
-CREATE USER SecondUser FOR LOGIN SecondUser;
+CREATE USER FirstUser FOR LOGIN FirstUserLogin;
+CREATE USER SecondUser FOR LOGIN SecondUserLogin;
 GO
 
 CREATE ROLE ROLE;
@@ -493,14 +494,14 @@ GO
 RECONFIGURE
 GO
 
-EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting out "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S DESKTOP-8MM2714\SQLEXPRESS';
+EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting out "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S ANANASOVIIKOMPM\SQLEXPRESS';
 GO
 
 SELECT * FROM accounting;
 GO
 
-EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting in "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S DESKTOP-8MM2714\SQLEXPRESS';
-GO
+-- EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting in "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S ANANASOVIIKOMPM\SQLEXPRESS';
+-- GO
 ------------------------------------------------------------------------------------
 
 --------------------------------------БЭКАП-----------------------------------------
