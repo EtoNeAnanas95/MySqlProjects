@@ -4,6 +4,24 @@ GO
 USE FirstSqlPractice;
 GO
 
+------------------------------------ПРЕДВАРИТЕЛЬНЫЕ ПАРАМЕТРЫ ДЛЯ НОРМАЛЬНОГО ВЫВОДА В CSV----------------------------------------------
+EXEC sp_configure 'show advanced option', 1
+GO
+
+RECONFIGURE
+GO
+
+EXEC sp_configure 'xp_cmdshell', 1
+GO
+
+RECONFIGURE
+GO
+
+EXEC xp_cmdshell 'mkdir C:\Users\Public\Documents\kiriloy_lybit_datagrip'
+GO
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
 ------------------------------------КОПИНИЯ БД ИЗ ПРЕДЫДУЩИХ ПРАКТОСОВ----------------------------------------------
 CREATE TABLE salary(
     ID_salary INT PRIMARY KEY IDENTITY(1,1),
@@ -408,115 +426,109 @@ GO
 UPDATE fine
     SET no_show = 10
 WHERE ID_fine = 6;
+GO
 ------------------------------------------------------------------------------------
 
-------------------ВТОРОЙ ТРИГГЕР (ЗАСЧИТАЙТЕ ВСЕХ ИХ КАК ОДИН)----------------------
+---------------------------------ВТОРОЙ ТРИГГЕР-------------------------------------
+DROP TRIGGER MakeCopyAccounting_TRIGGER;
 
---ДА ОНИ МАКСИМАЛЬНО ПРОСТЫЕ, НО Я МЕГА НЕУСПЕВАЮ ЭТО ДОДЕЛАТЬ(((
---ИЗВИНИТЕ ПОЖАЛУЙСТА)
+CREATE TRIGGER MakeCopyAccounting_TRIGGER
+ON accounting
+AFTER UPDATE
+AS
+    BEGIN
+       BACKUP DATABASE FirstSqlPractice TO DISK = 'C:\Users\Public\Documents\kiriloy_lybit_datagrip\Kiriloy_lybit_datagrip.bak';
+    END;
+GO
 
--- CREATE TRIGGER ShowLog1
--- ON fine
--- AFTER UPDATE
--- AS
---     BEGIN
---        PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В FINE'
---     END;
--- GO
+UPDATE accounting
+SET wages_payment_date = '1990-01-01'
+WHERE ID_accounting = 7;
+GO
+------------------------------------------------------------------------------------
 
--- CREATE TRIGGER ShowLog2
--- ON bonus
--- AFTER UPDATE
--- AS
---     BEGIN
---        PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В BONUS'
---     END;
--- GO
---
--- CREATE TRIGGER ShowLog3
--- ON wages
--- AFTER UPDATE
--- AS
---     BEGIN
---        PRINT 'БЫЛИ ВНЕСЕНЫ ИЗМЕНЕНИЯ В WAGES'
---     END;
--- GO
+---------------------------------ВТОРОЙ ТРИГГЕР-------------------------------------
+    --ДА ЗДЕСЬ ПУСТО, ПОТОМУ ЧТО Я НЕ СМОГ ПРИДУАТЬ НОРМАЛЬНЫЙ ТРИГГЕР
 ------------------------------------------------------------------------------------
 
 ------------------------------СОЗДАНИЕ ПОЛЬЗОВАТЕЛЕЙ--------------------------------
-CREATE LOGIN FirstUserLogin WITH PASSWORD = '123';
-CREATE LOGIN SecondUserLogin WITH PASSWORD = '123';
+
+CREATE LOGIN User_1_Login WITH PASSWORD = '123';
+GO
+CREATE LOGIN User_2_Login WITH PASSWORD = '123';
 GO
 
-CREATE USER FirstUser FOR LOGIN FirstUserLogin;
-CREATE USER SecondUser FOR LOGIN SecondUserLogin;
+CREATE USER User_1 FOR LOGIN User_1_Login;
+GO
+CREATE USER User_2 FOR LOGIN User_2_Login;
 GO
 
-CREATE ROLE ROLE;
+CREATE ROLE ROLE_TEST;
 GO
 ------------------------------------------------------------------------------------
 
 ------------------------------ДОБАВЛЕНИЕ ИХ В ГРУППУ--------------------------------
-ALTER ROLE ROLE ADD MEMBER FirstUser;
+ALTER ROLE ROLE_TEST ADD MEMBER User_1;
 GO
-ALTER ROLE ROLE ADD MEMBER SecondUser;
-GO
-
-GRANT SELECT ON salary TO FirstUser;
-GRANT SELECT ON bonus TO FirstUser;
-GRANT SELECT ON fine TO FirstUser;
-GRANT SELECT ON wages TO FirstUser;
-GRANT SELECT ON accounting TO FirstUser;
+ALTER ROLE ROLE_TEST ADD MEMBER User_2;
 GO
 
-GRANT SELECT, INSERT ON salary TO SecondUser;
-GRANT SELECT, INSERT ON bonus TO SecondUser;
-GRANT SELECT, INSERT ON fine TO SecondUser;
-GRANT SELECT, INSERT ON wages TO SecondUser;
-GRANT SELECT, INSERT ON accounting TO SecondUser;
+GRANT SELECT ON salary TO User_1;
 GO
+GRANT SELECT ON bonus TO User_1;
+GO
+GRANT SELECT ON fine TO User_1;
+GO
+GRANT SELECT ON wages TO User_1;
+GO
+GRANT SELECT ON accounting TO User_1;
+GO
+
+GRANT SELECT, INSERT ON salary TO User_2;
+GO
+GRANT SELECT, INSERT ON bonus TO User_2;
+GO
+GRANT SELECT, INSERT ON fine TO User_2;
+GO
+GRANT SELECT, INSERT ON wages TO User_2;
+GO
+GRANT SELECT, INSERT ON accounting TO User_2;
+GO
+
 ------------------------------------------------------------------------------------
 
 --------------------------------------LIKE------------------------------------------
-    --УСПЕЮ ЕЩЁ
+SELECT * FROM accounting WHERE accounting.name LIKE 'А%'; -- Вывел всех кто начинается на "А"
+SELECT * FROM accounting WHERE accounting.name LIKE '%ва%'; -- вывел всё, где хоть как-то встречаетя "ва"
+SELECT * FROM accounting WHERE accounting.name LIKE '_л%'; -- вывел людей у которых вторая буква в имени это "л". Поставил % в конце, чтоб он мог жальше бежать по содержимому
+SELECT * FROM accounting WHERE accounting.name LIKE '%\_%' ESCAPE '\'; -- ну это эксейп, он нужен чтоб экранировать спец. символы
+GO
 ------------------------------------------------------------------------------------
 
 ----------------------------------ИМПОРТ/ЭКСПОРТ------------------------------------
-EXEC sp_configure 'show advanced option', 1
-GO
-
-RECONFIGURE
-GO
-
-EXEC sp_configure 'xp_cmdshell', 1
-GO
-
-RECONFIGURE
-GO
-
-EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting out "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S ANANASOVIIKOMPM\SQLEXPRESS';
+EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting out "C:\Users\Public\Documents\kiriloy_lybit_datagrip\Export_accounting.csv" -w -t, -T -S DESKTOP-8MM2714\SQLEXPRESS';
 GO
 
 SELECT * FROM accounting;
 GO
 
--- EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting in "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S ANANASOVIIKOMPM\SQLEXPRESS';
--- GO
+--EXEC xp_cmdshell 'bcp FirstSqlPractice.dbo.accounting in "C:\Users\Public\Documents\Export_accounting.csv" -w -t, -T -S DESKTOP-8MM2714\SQLEXPRESS';
+--GO
 ------------------------------------------------------------------------------------
 
 --------------------------------------БЭКАП-----------------------------------------
-BACKUP DATABASE FirstSqlPractice TO DISK = 'KIRILOY.bak';
+BACKUP DATABASE FirstSqlPractice TO DISK = 'C:\Users\Public\Documents\kiriloy_lybit_datagrip\Kiriloy_lybit_datagrip.bak';
 GO
 
-USE master;
-GO
+-- USE master;
+-- GO
 
-DROP DATABASE FirstSqlPractice;
-GO;
+--DROP DATABASE FirstSqlPractice;
+--GO;
 
-CREATE DATABASE FirstSqlPractice;
-GO;
+--CREATE DATABASE FirstSqlPractice;
+--GO;
 
-RESTORE DATABASE FirstSqlPractice FROM DISK = 'KIRILOY.BAK';
-GO;
+--RESTORE DATABASE FirstSqlPractice FROM DISK = 'KIRILOY.BAK';
+--GO;
 ------------------------------------------------------------------------------------
