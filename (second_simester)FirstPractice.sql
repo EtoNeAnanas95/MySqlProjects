@@ -177,7 +177,7 @@ GO
 CREATE VIEW GetWages_VIEW AS
 SELECT
     CONVERT(VARCHAR(50), accounting.wages_payment_date) AS "Дата выдачи ЗП",
-    CONCAT(accounting.surname, ' ', LEFT(accounting.name, 1), '.', LEFT(accounting.middle_name, 1), '.') AS "Фамилия и инициалы сотрудника",
+    accounting.surname + ' ' + LEFT(accounting.name, 1) + '.' + LEFT(accounting.middle_name, 1) + '.' AS "Фамилия и инициалы сотрудника",
     'След. ЗП:' + ' ' + CONVERT(VARCHAR(50), wages.wage) AS "След. ЗП"
 FROM accounting
 INNER JOIN wages on accounting.wages_ID = wages.ID_wages;
