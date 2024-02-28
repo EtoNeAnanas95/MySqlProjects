@@ -137,7 +137,7 @@ GO
 CREATE VIEW HowManyFines_VIEW AS
 SELECT
     accounting.surname +  ' ' + LEFT(accounting.name, 1) + '.' + LEFT(accounting.middle_name, 1) + '.' AS "Фамилия и инициалы сотрудника",
-    CONCAT(CAST(SUM(wages.wage + fine.fine) AS VARCHAR(10)), ' - ', CAST(SUM(fine.fine) AS VARCHAR(10)), ' = ', CAST(SUM(wages.wage) AS VARCHAR(10))) AS "Вычет штрафа"
+    CONVERT(VARCHAR(10), SUM(wages.wage + fine.fine)) + ' - ' + CONVERT(VARCHAR(10),SUM(fine.fine)) + ' = ' + CONVERT(VARCHAR(10),SUM(wages.wage)) AS "Вычет штрафа"
 FROM
     accounting
 INNER JOIN
