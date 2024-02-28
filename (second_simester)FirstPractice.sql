@@ -134,7 +134,7 @@ GO
 ------------------------------------------------------------------------------------
 
 ------------------------------ПЕРВОЕ ПРЕДСТАВЛЕНИЕ----------------------------------
-CREATE VIEW HowManyFines_VIEW AS
+CREATE VIEW HowManyFines_VIEW AS --TODO ПОРАВИТЬ CONCATЫ ВЕЗДЕ
 SELECT
     CONCAT(accounting.surname, ' ', LEFT(accounting.name, 1), '.', LEFT(accounting.middle_name, 1), '.') AS "Фамилия и инициалы сотрудника",
     CONCAT(CAST(SUM(wages.wage + fine.fine) AS VARCHAR(10)), ' - ', CAST(SUM(fine.fine) AS VARCHAR(10)), ' = ', CAST(SUM(wages.wage) AS VARCHAR(10))) AS "Вычет штрафа"
@@ -381,9 +381,22 @@ GO
 ------------------------------------------------------------------------------------
 
 ---------------------------------ТРЕТЬЯ ФУНКЦИЯ-------------------------------------
+CREATE FUNCTION GetSalaryOnPost(@POST VARCHAR(25))
+RETURNS INT
+AS
+    BEGIN
+        DECLARE @SALARY_POST INT;
 
-    --ДА, ЗДЕСЬ ПУСТО, ПОТОМУ ЧТО Я НЕ ПРИДУМАЛ ЧТО ОНА МОЖЕТ ДЕЛАТЬ
+        SELECT @SALARY_POST = salary.salary
+        FROM salary
+        WHERE salary.post = @POST;
 
+        RETURN @SALARY_POST;
+    END;
+GO
+
+PRINT 'зарплата ген. дира: ' + CONVERT(VARCHAR(50), dbo.GetSalaryOnPost ('ген. дир.'));
+GO
 ------------------------------------------------------------------------------------
 
 ---------------------------------ПЕРВЫЙ ТРИГГЕР-------------------------------------
@@ -430,15 +443,13 @@ GO
 ------------------------------------------------------------------------------------
 
 ---------------------------------ВТОРОЙ ТРИГГЕР-------------------------------------
-DROP TRIGGER MakeCopyAccounting_TRIGGER;
-
 CREATE TRIGGER MakeCopyAccounting_TRIGGER
 ON accounting
 AFTER UPDATE
 AS
-    BEGIN
+    COMMIT TRANSACTION;
        BACKUP DATABASE FirstSqlPractice TO DISK = 'C:\Users\Public\Documents\kiriloy_lybit_datagrip\Kiriloy_lybit_datagrip.bak';
-    END;
+    BEGIN TRANSACTION;
 GO
 
 UPDATE accounting
@@ -447,8 +458,18 @@ WHERE ID_accounting = 7;
 GO
 ------------------------------------------------------------------------------------
 
----------------------------------ВТОРОЙ ТРИГГЕР-------------------------------------
-    --ДА ЗДЕСЬ ПУСТО, ПОТОМУ ЧТО Я НЕ СМОГ ПРИДУАТЬ НОРМАЛЬНЫЙ ТРИГГЕР
+---------------------------------ТРЕТИЙ ТРИГГЕР-------------------------------------
+CREATE TRIGGER PROSTO_TRIGGER_KOTORII_YA_NE_HOTEL_DELAT
+ON salary
+AFTER INSERT
+AS
+    BEGIN
+       PRINT 'YOU SPIN ME RIGHT ROUND, BABY RIGHT ROUND, LIKE A RECOD BABY RIGHT ROUND RIGHT ROUND'
+    END;
+GO
+
+INSERT INTO salary (salary, post) VALUES (999999999, 'КАНИ ИСТ')
+GO
 ------------------------------------------------------------------------------------
 
 ------------------------------СОЗДАНИЕ ПОЛЬЗОВАТЕЛЕЙ--------------------------------
