@@ -134,9 +134,9 @@ GO
 ------------------------------------------------------------------------------------
 
 ------------------------------ПЕРВОЕ ПРЕДСТАВЛЕНИЕ----------------------------------
-CREATE VIEW HowManyFines_VIEW AS --TODO ПОРАВИТЬ CONCATЫ ВЕЗДЕ
+CREATE VIEW HowManyFines_VIEW AS
 SELECT
-    CONCAT(accounting.surname, ' ', LEFT(accounting.name, 1), '.', LEFT(accounting.middle_name, 1), '.') AS "Фамилия и инициалы сотрудника",
+    accounting.surname +  ' ' + LEFT(accounting.name, 1) + '.' + LEFT(accounting.middle_name, 1) + '.' AS "Фамилия и инициалы сотрудника",
     CONCAT(CAST(SUM(wages.wage + fine.fine) AS VARCHAR(10)), ' - ', CAST(SUM(fine.fine) AS VARCHAR(10)), ' = ', CAST(SUM(wages.wage) AS VARCHAR(10))) AS "Вычет штрафа"
 FROM
     accounting
@@ -155,17 +155,17 @@ GO
 ------------------------------ВТОРОЕ ПРЕДСТАВЛЕНИЕ----------------------------------
 CREATE VIEW GetFullInfo_VIEW AS
 SELECT
-    CONCAT(accounting.surname, ' ', LEFT(accounting.name, 1), '.', LEFT(accounting.middle_name, 1), '.') AS "Фамилия и инициалы сотрудника",
+    accounting.surname +  ' ' + LEFT(accounting.name, 1) + '.' + LEFT(accounting.middle_name, 1) + '.' AS "Фамилия и инициалы сотрудника",
     'Должность:' + ' ' + salary.post AS "Должность",
     'Оклад:' + ' ' + CONVERT(VARCHAR(50), salary.salary) AS "Оклад",
     'Премия:' + ' ' + CONVERT(VARCHAR(50), bonus.bonus) AS "Премия"
 FROM
     accounting
-JOIN
+INNER JOIN
     wages on accounting.wages_ID = wages.ID_wages
-JOIN
+INNER JOIN
     bonus on wages.bonus_ID = bonus.ID_bonus
-JOIN
+INNER JOIN
     salary on wages.salary_ID = salary.ID_salary;
 GO
 
@@ -180,7 +180,7 @@ SELECT
     CONCAT(accounting.surname, ' ', LEFT(accounting.name, 1), '.', LEFT(accounting.middle_name, 1), '.') AS "Фамилия и инициалы сотрудника",
     'След. ЗП:' + ' ' + CONVERT(VARCHAR(50), wages.wage) AS "След. ЗП"
 FROM accounting
-JOIN wages on accounting.wages_ID = wages.ID_wages;
+INNER JOIN wages on accounting.wages_ID = wages.ID_wages;
 GO
 
 SELECT * FROM GetWages_VIEW;
